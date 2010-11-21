@@ -7,28 +7,28 @@ require 'uri'
 
 $KCODE = 'u'
 
-#def boardlist
-#url = 'http://balloo.jp/balloo/cgi/boardlist.php';
-#$re = file_get_contents($url);
-#var_dump($re);
-#end
-
 class Balloo
 
   def initialize()
     @lastno = 0
     @channel_code = 'livenhk_'
     @channel_list = [
-      'livenhk_',
-      'liveetv_',
-      'liventv_',
-      'livetbs_',
-      'livecx_',
-      'liveanb_',
-      'livetx_',
+      'livenhk_', # NHK総合
+      'liveetv_', # NHK教育
+      'liventv_', # 日本テレビ
+      'livetbs_', # 東京放送
+      'livecx_',  # フジテレビ
+      'liveanb_', # テレビ朝日
+      'livetx_',  # テレビ東京'
     ]
   end
 
+#def boardlist
+#url = 'http://balloo.jp/balloo/cgi/boardlist.php';
+#$re = file_get_contents($url);
+#var_dump($re);
+#end
+        
   def fetch()
     source = ''
     hostname = "balloo.jp";
@@ -61,6 +61,9 @@ class Balloo
   end
 
   def set_channel(channel_code)
+    if !@channel_list.index(channel_code)
+      return
+    end
     @lastno = 0
     @channel_code = channel_code
   end
@@ -80,8 +83,13 @@ def send(text, color = 1)
   end
 end
 
+channel_code = ARGV.shift
+if channel_code.empty?
+  channel_code = 'liventv_'
+end
+
 balloo = Balloo.new
-balloo.set_channel('liventv_')
+balloo.set_channel(channel_code)
 
 while true do
   source = balloo.fetch
@@ -98,6 +106,7 @@ while true do
 end
 
 =begin
+#API test data
 source = <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <board name="tv-jikkyo">
@@ -108,24 +117,4 @@ source = <<EOF
 </thread>
 </board>
 EOF
-
-$lastno = 54719;
-$channel_list = array_keys($channel_list);
-$channel_code = $channel_list[0];
-
-$url = "http://balloo.jp/balloo/cgi/getthread.php?thread_id={$channel_code}&lastno={$lastno}";
-
-$re = file_get_contents($url);
-var_dump($re);
-
-/*
-<?xml version="1.0" encoding="UTF-8"?>
-<board name="tv-jikkyo">
-<thread channel="livenhk" regist="20101121141143" serial="7816" title="ＮＨＫアーカイブス" update="20101121145858">
-<speak location="2ch" no="54726" originalID="3805201" originalNum="990" timestamp="20101121145858" who="w+TPZ0Ww"> ギルガメッシュナイト </speak>
-<speak location="2ch" no="54727" originalID="3805201" originalNum="991" timestamp="20101121145858" who="Doud+i5j"> &#60;a id=&quot;tanchor_54727-0&quot; href=&quot;javascript:showRelation(54714, '54727-0')&quot;&#62;&amp;gt;&amp;gt;978&#60;/a&#62;( １１ＰＭのスキャットの人と、アルプスの少女ハイジ...)
- 伊集加代子だろ </speak>
-</thread>
-</board>
-*/
 =end
