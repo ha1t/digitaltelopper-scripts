@@ -7,6 +7,8 @@ require 'uri'
 
 $KCODE = 'u'
 
+DT_ADDRESS = 'http://192.168.1.25'; # デジタルテロッパのIPアドレスまたはホスト名
+
 class Balloo
 
   def initialize()
@@ -75,7 +77,7 @@ def send(text, color = 1)
     return
   end
 
-  url = "http://192.168.1.25/user.cgi?data=#{text}&color=#{color}"
+  url = DT_ADDRESS + "/user.cgi?data=#{text}&color=#{color}"
   begin
     open(url)
     sleep 0.2
@@ -84,7 +86,7 @@ def send(text, color = 1)
 end
 
 channel_code = ARGV.shift
-if channel_code.empty?
+if channel_code && channel_code.empty?
   channel_code = 'liventv_'
 end
 
